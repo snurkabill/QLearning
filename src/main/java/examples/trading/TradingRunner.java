@@ -36,12 +36,19 @@ public class TradingRunner {
         Trading trading = new Trading(actions, new Random(0), learningRate, discountFactor, randomFactor, features,
                 10, 0, sizeOfSeenFector, new ParameterizedSinus(0, 1, 1, 1), 0);
         trading.run(100000, 100, 0);
+
         trading.setRandomFactor(0.5);
-        trading.run(100000, 100, 0);
-        trading.setRandomFactor(0.2);
-        trading.run(100000, 100, 0);
-        trading.reseLearningAtributes();
         trading.initialize(10, 0, 0);
+        trading.run(100000, 100, 0);
+
+        trading.setRandomFactor(0.2);
+        trading.initialize(10, 0, 0);
+        trading.run(1000000, 100, 0);
+
+        trading.run(1, 100, 0);
+
+        trading.reseLearningAtributes();
+        trading.initialize(15, 5, 0);
         trading.run(1, 10000);
 
 
