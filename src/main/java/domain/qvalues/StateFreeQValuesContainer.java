@@ -11,7 +11,7 @@ public class StateFreeQValuesContainer extends QValuesContainer {
     private final List<Feature> features;
     private final double[] weights;
 
-    public StateFreeQValuesContainer(List<Action> actions, List<Feature> features) {
+    public StateFreeQValuesContainer(Action[] actions, List<Feature> features) {
         super(actions);
         this.features = features;
         this.weights = new double[features.size()];

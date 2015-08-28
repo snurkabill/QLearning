@@ -1,12 +1,11 @@
 package domain.qvalues;
 
-import domain.State;
 import domain.Action;
 import domain.ActionQValuePair;
+import domain.State;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class StateBasedQValuesContainer extends QValuesContainer {
@@ -45,14 +44,14 @@ public class StateBasedQValuesContainer extends QValuesContainer {
 
     private final Map<Long, QValues> qValues = new HashMap<>();
 
-    public StateBasedQValuesContainer(List<Action> actions) {
+    public StateBasedQValuesContainer(Action[] actions) {
         super(actions);
     }
 
     @Override
     public double getQ(State state, Action action) {
         if(!qValues.containsKey(state.createHashCode())) {
-            qValues.put(state.createHashCode(), new QValues(actions.size()));
+            qValues.put(state.createHashCode(), new QValues(actions.length));
         }
         return qValues.get(state.createHashCode()).getQValueToAction(action);
     }
@@ -60,7 +59,7 @@ public class StateBasedQValuesContainer extends QValuesContainer {
     @Override
     public void setQ(State state, Action action, double learningRate, double oldQValue, double learnedValue) {
         if(!qValues.containsKey(state.createHashCode())) {
-            qValues.put(state.createHashCode(), new QValues(actions.size()));
+            qValues.put(state.createHashCode(), new QValues(actions.length));
         }
         qValues.get(state.createHashCode()).setQValue(action, oldQValue + learningRate * (learnedValue - oldQValue));
     }

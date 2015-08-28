@@ -13,9 +13,9 @@ public class GridWorld extends QLearning {
     private int x;
     private int y;
 
-    public GridWorld(List<Action> actions, Random random, Type type, double learningRate, double discountFactor,
+    public GridWorld(List<Action> actions, Random random, double learningRate, double discountFactor,
                      double randomFactor, List<List<GridCell>> cells, int x, int y) {
-        super(actions, random, type, learningRate, discountFactor, randomFactor);
+        super(actions, random, learningRate, discountFactor, randomFactor, null);
         this.cells = cells;
         this.x = x;
         this.y = y;
@@ -45,5 +45,10 @@ public class GridWorld extends QLearning {
     protected double calcReward(State oldState, State newState, Action action) {
         GridWorldState state = (GridWorldState) newState;
         return cells.get((state).getX()).get(state.getY()).getReward();
+    }
+
+    @Override
+    protected State createNextState(State oldState, Action action) {
+        return action.createNextState(oldState);
     }
 }

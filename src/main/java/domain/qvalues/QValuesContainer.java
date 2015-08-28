@@ -1,24 +1,22 @@
 package domain.qvalues;
 
+import domain.Action;
 import domain.ActionQValuePair;
 import domain.State;
-import domain.Action;
-
-import java.util.List;
 
 public abstract class QValuesContainer {
 
-    protected final List<Action> actions;
+    protected final Action[] actions;
 
-    public QValuesContainer(List<Action> actions) {
+    public QValuesContainer(Action[] actions) {
         this.actions = actions;
     }
 
     public ActionQValuePair getActionWithHighestQValue(State state) {
         int bestActionIndex = -1;
         double max = -Double.MAX_VALUE;
-        for (int i = 0; i < actions.size(); i++) {
-            double actionQ = getQ(state, actions.get(i));
+        for (int i = 0; i < actions.length; i++) {
+            double actionQ = getQ(state, actions[i]);
             if(actionQ > max) {
                 max = actionQ;
                 bestActionIndex = i;

@@ -3,10 +3,10 @@ package domain;
 import domain.qvalues.QValuesContainer;
 import domain.qvalues.StateBasedQValuesContainer;
 import domain.qvalues.StateFreeQValuesContainer;
+import domain.qvalues.features.Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -14,33 +14,31 @@ public abstract class QLearning {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(QLearning.class.getName());
 
-    public enum Type {
-        STATE_FREE,
-        STATE_BASED
-    }
-
     private double learningRate;
     private double discountFactor;
     private double randomFactor;
 
-    private final List<Action> actions;
+    private final Action[] actions;
     private final Random random;
     private final QValuesContainer qValuesContainer;
 
-    public QLearning(List<Action> actions, Random random, Type type, double learningRate,
-                     double discountFactor, double randomFactor) {
-        if(type == Type.STATE_FREE) {
-            throw new UnsupportedOperationException("Not supported yet");
-        }
-        ArrayList<Action> convertedList = new ArrayList<>(actions);
-        qValuesContainer = type == Type.STATE_BASED ?
-                new StateBasedQValuesContainer(convertedList) :
-                new StateFreeQValuesContainer(convertedList);
+    public QLearning(List<Action> actions, Random random, double learningRate, double discountFactor,
+                      double randomFactor, List<Feature> features) {
         this.random = random;
-        this.actions = convertedList;
+        this.actions = convertListToArray(actions);
         this.learningRate = learningRate;
         this.discountFactor = discountFactor;
         this.randomFactor = randomFactor;
+        this.qValuesContainer = features == null ? new StateBasedQValuesContainer(this.actions) :
+                new StateFreeQValuesContainer(this.actions, features);
+    }
+
+    private Action[] convertListToArray(List<Action> actions) {
+        Action[] convertedArray = new Action[actions.size()];
+        for (int i = 0; i < convertedArray.length; i++) {
+            convertedArray[i] = actions.get(i);
+        }
+        return convertedArray;
     }
 
     public double getLearningRate() {
@@ -73,16 +71,28 @@ public abstract class QLearning {
 
     protected abstract double calcReward(State oldState, State newState, Action action);
 
-    protected void beforeStart() {
+    protected abstract State createNextState(State oldState, Action action);
+
+    public void reseLearningAtributes() {
+        this.learningRate = 0.0;
+        this.discountFactor = 0.0;
+        this.randomFactor = 0.0;
+    }
+
+    protected void beforeEpisode() {
         LOGGER.info("Starting episode");
     }
 
+    protected void afterEpiose(State oldState, int iterationsCount) {
+        LOGGER.info("Ending episode after {} steps", iterationsCount);
+    }
+
     private Action createRandomAction(State state) {
-        return actions.get(random.nextInt(actions.size()));
+        return actions[random.nextInt(actions.length)];
     }
 
     private Action determineNextAction(State state) {
-        return actions.get(qValuesContainer.getActionWithHighestQValue(state).getActionIndex());
+        return actions[qValuesContainer.getActionWithHighestQValue(state).getActionIndex()];
     }
 
     private Action createAction(State state) {
@@ -100,6 +110,7 @@ public abstract class QLearning {
     }
 
     public void run(int episodesCount, int maxIterationsPerEpisode) {
+        LOGGER.info("Starting {} episodes each with {} iterations", episodesCount, maxIterationsPerEpisode);
         for (int i = 0; i < episodesCount; i++) {
             run(maxIterationsPerEpisode);
         }
@@ -110,20 +121,18 @@ public abstract class QLearning {
         run(numberOfIterations);
     }
 
-    public void run(int numberOfIterations) {
-        beforeStart();
+    public void run(int iterationsCount) {
+        beforeEpisode();
         State newState = createState();
-        for (int i = 0; i < numberOfIterations; i++) {
+        int iterations = 0;
+        for (; !isFinished(newState) && iterations < iterationsCount; iterations++) {
             State oldState = newState;
-            if(isFinished(oldState)) {
-                LOGGER.info("Ending episode after {} steps", i);
-                break;
-            }
             Action action = createAction(oldState);
             LOGGER.info("Action index: {}", action.getIndex());
-            newState = action.createNextState(oldState);
+            newState = createNextState(oldState, action);
             calculateQ(oldState, newState, action);
         }
+        afterEpiose(newState, iterations);
     }
 
     protected void calculateQ(State oldState, State newState, Action action) {
