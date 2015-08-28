@@ -1,8 +1,9 @@
-package domain.qvalues;
+package domain.qvalues.statebased;
 
 import domain.Action;
 import domain.ActionQValuePair;
 import domain.State;
+import domain.qvalues.QValuesContainer;
 
 import java.util.Arrays;
 import java.util.HashMap;

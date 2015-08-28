@@ -2,7 +2,7 @@ package examples.trading.domain;
 
 import domain.Action;
 import domain.State;
-import domain.qvalues.features.Feature;
+import domain.qvalues.statefree.features.Feature;
 
 public class DeltaPriceFeature implements Feature {
 
@@ -14,6 +14,6 @@ public class DeltaPriceFeature implements Feature {
 
     @Override
     public double calculateFeature(State state, Action action) {
-        return ((TradingState)action.createNextState(state)).getDeltaPrice()[index];
+        return ((TradingState)action.createNextState(state)).getDeltaPrice()[index] - 1;
     }
 }

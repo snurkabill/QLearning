@@ -1,9 +1,9 @@
 package domain;
 
 import domain.qvalues.QValuesContainer;
-import domain.qvalues.StateBasedQValuesContainer;
-import domain.qvalues.StateFreeQValuesContainer;
-import domain.qvalues.features.Feature;
+import domain.qvalues.statebased.StateBasedQValuesContainer;
+import domain.qvalues.statefree.StateFreeQValuesContainer;
+import domain.qvalues.statefree.generalization.FeatureBasedStateEvaluator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,14 +23,14 @@ public abstract class QLearning {
     private final QValuesContainer qValuesContainer;
 
     public QLearning(List<Action> actions, Random random, double learningRate, double discountFactor,
-                      double randomFactor, List<Feature> features) {
+                      double randomFactor, FeatureBasedStateEvaluator featureBasedStateEvaluator) {
         this.random = random;
         this.actions = convertListToArray(actions);
         this.learningRate = learningRate;
         this.discountFactor = discountFactor;
         this.randomFactor = randomFactor;
-        this.qValuesContainer = features == null ? new StateBasedQValuesContainer(this.actions) :
-                new StateFreeQValuesContainer(this.actions, features);
+        this.qValuesContainer = featureBasedStateEvaluator == null ? new StateBasedQValuesContainer(this.actions) :
+                new StateFreeQValuesContainer(this.actions, featureBasedStateEvaluator);
     }
 
     private Action[] convertListToArray(List<Action> actions) {
@@ -128,7 +128,6 @@ public abstract class QLearning {
         for (; !isFinished(newState) && iterations < iterationsCount; iterations++) {
             State oldState = newState;
             Action action = createAction(oldState);
-            LOGGER.info("Action index: {}", action.getIndex());
             newState = createNextState(oldState, action);
             calculateQ(oldState, newState, action);
         }

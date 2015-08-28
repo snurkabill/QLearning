@@ -3,7 +3,7 @@ package examples.trading;
 import domain.Action;
 import domain.QLearning;
 import domain.State;
-import domain.qvalues.features.Feature;
+import domain.qvalues.statefree.generalization.FeatureBasedStateEvaluator;
 import examples.trading.data.AbstractTimeSeriesGenerator;
 import examples.trading.domain.TradingState;
 
@@ -24,9 +24,9 @@ public class Trading extends QLearning {
     private int time;
 
     public Trading(List<Action> actions, Random random, double learningRate, double discountFactor, double randomFactor,
-                   List<Feature> features, double startingMoney, int startingCommodity, int sizeOfSeenVector,
-                   AbstractTimeSeriesGenerator generator, int startingTime) {
-        super(actions, random, learningRate, discountFactor, randomFactor, features);
+                   FeatureBasedStateEvaluator featureBasedStateEvaluator, double startingMoney, int startingCommodity,
+                   int sizeOfSeenVector, AbstractTimeSeriesGenerator generator, int startingTime) {
+        super(actions, random, learningRate, discountFactor, randomFactor, featureBasedStateEvaluator);
         this.deltaPrices = new double[sizeOfSeenVector];
         this.prices = new double[sizeOfSeenVector];
         this.generator = generator;
@@ -117,7 +117,7 @@ public class Trading extends QLearning {
         if(tradingNewState.getMoney() < 0.0) {
             return -1000;
         }
-        return tradingOldState.getMoney() - tradingNewState.getMoney();
+        return tradingNewState.getMoney() - tradingOldState.getMoney();
     }
 
     @Override

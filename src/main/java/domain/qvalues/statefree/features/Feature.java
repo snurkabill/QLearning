@@ -1,4 +1,4 @@
-package domain.qvalues.features;
+package domain.qvalues.statefree.features;
 
 import domain.Action;
 import domain.State;
