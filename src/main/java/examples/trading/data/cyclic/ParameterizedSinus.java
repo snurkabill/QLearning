@@ -7,17 +7,17 @@ public class ParameterizedSinus extends AbstractTimeSeriesGenerator {
     private final double shiftX;
     private final double shiftY;
     private final double frequencyCoeff;
-    private final double coeff;
+    private final double sizeCoeff;
 
-    public ParameterizedSinus(double shiftX, double shiftY, double frequencyCoeff, double coeff) {
+    public ParameterizedSinus(double shiftX, double shiftY, double frequencyCoeff, double sizeCoeff) {
         this.shiftX = shiftX;
         this.shiftY = shiftY;
         this.frequencyCoeff = frequencyCoeff;
-        this.coeff = coeff;
+        this.sizeCoeff = sizeCoeff;
     }
 
     @Override
     public double getValue(long time) {
-        return coeff * Math.sin(time * frequencyCoeff + shiftX) + shiftY;
+        return sizeCoeff * Math.sin(time * frequencyCoeff + shiftX) + shiftY;
     }
 }

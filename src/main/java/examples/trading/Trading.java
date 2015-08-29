@@ -112,10 +112,10 @@ public class Trading extends QLearning {
         TradingState tradingOldState = (TradingState) oldState;
         TradingState tradingNewState = (TradingState) newState;
         if(tradingNewState.getCommodity() < 0) {
-            return -10;
+            return -100;
         }
         if(tradingNewState.getMoney() < 0.0) {
-            return -10;
+            return -100;
         }
         return tradingNewState.getMoney() - tradingOldState.getMoney();
     }

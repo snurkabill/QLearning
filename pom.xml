@@ -24,7 +24,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>net.snurkabill.</mainClass>
+                            <mainClass>examples.trading.TradingRunner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -48,7 +48,7 @@
                 <configuration>
                     <executable>java</executable>
                     <classpathScope>runtime</classpathScope>
-                    <mainClass>net.snurkabill.</mainClass>
+                    <mainClass>examples.trading.TradingRunner</mainClass>
                     <arguments>
                         <!--argument>-Xms256m</argument>
                         <argument>-Xmx1024m</argument-->
