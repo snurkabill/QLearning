@@ -6,10 +6,7 @@ import domain.qvalues.statefree.features.Feature;
 import domain.qvalues.statefree.generalization.LinearStateEvaluator;
 import domain.qvalues.statefree.generalization.NonLinearStateEvaluatorBasedOnNeuralNetwork;
 import examples.trading.data.cyclic.ParameterizedSinus;
-import examples.trading.domain.CommodityFeature;
-import examples.trading.domain.DeltaPriceFeature;
-import examples.trading.domain.MoneyFeature;
-import examples.trading.domain.TradingAction;
+import examples.trading.domain.*;
 import net.snurkabill.neuralnetworks.heuristic.FeedForwardHeuristic;
 import net.snurkabill.neuralnetworks.math.function.transferfunction.LinearFunction;
 import net.snurkabill.neuralnetworks.math.function.transferfunction.ParametrizedHyperbolicTangens;
@@ -38,15 +35,15 @@ public class TradingRunner {
         double randomFactor = 0.8;
         int sizeOfSeenFector = 5;
         List<Feature> features = new ArrayList<>();
-        features.add(new BiasFeature());
         features.add(new MoneyFeature());
         features.add(new CommodityFeature());
+        features.add(new IsActionDoable());
         for (int i = 0; i < sizeOfSeenFector; i++) {
             features.add(new DeltaPriceFeature(i));
         }
 
         FeedForwardHeuristic heuristic = new FeedForwardHeuristic();
-        heuristic.learningRate = 0.001;
+        heuristic.learningRate = 0.1;
         heuristic.l2RegularizationConstant = 0.0;
         heuristic.dynamicKillingWeights = false;
         heuristic.momentum = 0.0;
@@ -54,8 +51,8 @@ public class TradingRunner {
         heuristic.dynamicBoostingEtas = false;
 
         OnlineFeedForwardNetwork neuralNetwork = new OnlineFeedForwardNetwork("asdf",
-                Arrays.asList(features.size(), features.size(), 1),
-                Arrays.asList(new ParametrizedHyperbolicTangens(), new LinearFunction()),
+                Arrays.asList(features.size(), features.size(), features.size(), 1),
+                Arrays.asList(new ParametrizedHyperbolicTangens(), new ParametrizedHyperbolicTangens(),  new LinearFunction()),
                 new GaussianRndWeightsFactory(0.1, 0), FeedForwardHeuristic.createDefaultHeuristic());
 
         Trading trading = new Trading(actions, new Random(0), learningRate, discountFactor, randomFactor,
@@ -74,6 +71,27 @@ public class TradingRunner {
         trading.reseLearningAtributes();
         trading.initialize(15, 5, 0);
         trading.run(1, 10000);
+
+
+        trading.reseLearningAtributes();
+        trading.initialize(15, 5, 1);
+        trading.run(1, 10000);
+
+        trading.reseLearningAtributes();
+        trading.initialize(15, 5, 2);
+        trading.run(1, 10000);
+
+        trading.reseLearningAtributes();
+        trading.initialize(15, 5, 3);
+        trading.run(1, 10000);
+
+        trading.reseLearningAtributes();
+        trading.initialize(15, 5, 4);
+        trading.run(1, 10000);
+
+        trading.reseLearningAtributes();
+        trading.initialize(15, 5, 5);
+        trading.run(1, 10000);
     }
 
     public static void linearVersion() {
@@ -90,11 +108,15 @@ public class TradingRunner {
         features.add(new BiasFeature());
         features.add(new MoneyFeature());
         features.add(new CommodityFeature());
+        features.add(new IsActionDoable());
         for (int i = 0; i < sizeOfSeenFector; i++) {
             features.add(new DeltaPriceFeature(i));
         }
+        int startingMoney = 10;
+        int startingCommodity = 0;
         Trading trading = new Trading(actions, new Random(0), learningRate, discountFactor, randomFactor,
-                new LinearStateEvaluator(features), 10, 0, sizeOfSeenFector, new ParameterizedSinus(0, 1, 1, 1), 0);
+                new LinearStateEvaluator(features), startingMoney, startingCommodity, sizeOfSeenFector,
+                new ParameterizedSinus(0, 1, 1, 1), 0);
         trading.run(100000, 100, 0);
 
         trading.setRandomFactor(0.5);
@@ -105,10 +127,5 @@ public class TradingRunner {
         trading.initialize(10, 0, 0);
         trading.run(1000000, 100, 0);
 
-        trading.run(1, 100, 0);
-
-        trading.reseLearningAtributes();
-        trading.initialize(15, 5, 0);
-        trading.run(1, 10000);
     }
 }

@@ -1,6 +1,7 @@
 package domain.qvalues.statefree;
 
 import domain.Action;
+import domain.QLearning;
 import domain.State;
 import domain.qvalues.QValuesContainer;
 import domain.qvalues.statefree.generalization.FeatureBasedStateEvaluator;
@@ -22,6 +23,9 @@ public class StateFreeQValuesContainer extends QValuesContainer {
     @Override
     public void setQ(State oldState, Action action, double learningRate, double oldValue, double learnedValue) {
         double difference = learnedValue - oldValue;
-        featureBasedStateEvaluator.applyTemporalDifference(oldState, action, difference, learningRate);
+        if(learningRate != 0.0) {
+            QLearning.LOGGER.info("learning!");
+            featureBasedStateEvaluator.applyTemporalDifference(oldState, action, difference, learningRate);
+        }
     }
 }
