@@ -22,6 +22,16 @@ import java.util.Random;
 public class TradingRunner {
 
     public static void main(String [] args) {
+
+        Random random = new Random();
+
+
+        for (int i = 0; i < 100; i++) {
+            random.setSeed(random.nextLong());
+        }
+
+
+
         useNeuralNetwork();
     }
 
@@ -36,7 +46,7 @@ public class TradingRunner {
             actions.add(new TradingAction(i + 1 + tradeActionsCount, (int) Math.pow(2, i), TradingAction.Type.SELL));
         }
 
-        double learningRate = 0.001;
+        double learningRate = 0.0001;
         double discountFactor = 0.5;
         double randomFactor = 0.8;
         int sizeOfSeenVector = 5;
@@ -49,41 +59,72 @@ public class TradingRunner {
             features.add(new DeltaPriceFeature(i));
         }
         FeedForwardHeuristic heuristic = new FeedForwardHeuristic();
-        heuristic.learningRate = 0.1;
+        heuristic.learningRate = 0.0000001;
         heuristic.l2RegularizationConstant = 0.0;
         heuristic.dynamicKillingWeights = false;
-        heuristic.momentum = 0.0;
+        heuristic.momentum = 0.000;
         heuristic.BOOSTING_ETA_COEFF = 0.0;
         heuristic.dynamicBoostingEtas = false;
         OnlineFeedForwardNetwork neuralNetwork = new OnlineFeedForwardNetwork("asdf",
-                Arrays.asList(features.size(), features.size(), features.size(), 1),
-                Arrays.asList(new ParametrizedHyperbolicTangens(), new ParametrizedHyperbolicTangens(),  new LinearFunction()),
-                new GaussianRndWeightsFactory(0.1, 0), FeedForwardHeuristic.createDefaultHeuristic());
+                Arrays.asList(/*features.size(), */features.size(), features.size(),  1),
+                Arrays.asList(/*new ParametrizedHyperbolicTangens(),*/ new ParametrizedHyperbolicTangens(), new LinearFunction()),
+                new GaussianRndWeightsFactory(0.1, 0), heuristic);
+        OnlineFeedForwardNetwork neuralNetwork2 = new OnlineFeedForwardNetwork("asdf2",
+                Arrays.asList(/*features.size(),*/ features.size(), features.size(),  1),
+                Arrays.asList(/*new ParametrizedHyperbolicTangens(),*/ new ParametrizedHyperbolicTangens(), new LinearFunction()),
+                new GaussianRndWeightsFactory(0.1, 0), heuristic);
         Trading trading = new Trading(actions, new Random(0), learningRate, discountFactor, randomFactor,
-                new NonLinearStateEvaluatorBasedOnNeuralNetwork(features, neuralNetwork), 10, 0, sizeOfSeenVector,
+                new NonLinearStateEvaluatorBasedOnNeuralNetwork(features, neuralNetwork),
+                new NonLinearStateEvaluatorBasedOnNeuralNetwork(features, neuralNetwork2), 10, 0, sizeOfSeenVector,
                 new ParameterizedSinus(0, 1, 1, 1), 0);
-        trading.run(100000, 1000, 0);
+        /*trading.run(1000, 1000, 0);
         trading.setRandomFactor(0.5);
         trading.initialize(10, 0, 0);
-        trading.run(100000, 1000, 0);
+        trading.run(10000, 1000, 0);*/
 
-        trading.setRandomFactor(0.2);
-        trading.initialize(10, 0, 0);
-        trading.run(100000, 1000, 0);
+
+        for (int i = 0; i < 1000; i++) {
+            QLearning.LOGGER.info("------------------------------------------------------");
+            trading.setLearningRate(0.001);
+            trading.setDiscountFactor(0.5);
+            trading.setMode(QLearning.Mode.TRAINING);
+            /*randomFactor = Math.pow(Math.E, (double) -i / 3.0) / 3;
+            QLearning.LOGGER.info("Random Factor: {}", randomFactor);*/
+            trading.setRandomFactor(0.3/*randomFactor*/);
+            trading.initialize(10, 0, 0);
+            trading.run(10000, 1000, 0);
+
+            int startingMoney = 10;
+            int startingCommodity = 0;
+
+            trading.setMode(QLearning.Mode.TESTING);
+            trading.initialize(startingMoney, startingCommodity, 0);
+            trading.run(1, 1000);
+            TradingState state = trading.getLastState();
+            QLearning.LOGGER.info("Money {}, Commodity: {}", state.getMoney() - startingMoney, state.getCommodity() - startingCommodity);
+//            try {
+//                System.in.read();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+            /*trading.reseLearningAtributes();
+            trading.initialize(startingMoney, startingCommodity, 1);
+            trading.run(1, 100100);
+            state = trading.getLastState();
+            QLearning.LOGGER.info("Money {}, Commodity: {}", state.getMoney() - startingMoney, state.getCommodity() - startingCommodity);
+
+            trading.reseLearningAtributes();
+            trading.initialize(startingMoney, startingCommodity, 2);
+            trading.run(1, 101000);
+            state = trading.getLastState();
+            QLearning.LOGGER.info("Money {}, Commodity: {}", state.getMoney() - startingMoney, state.getCommodity() - startingCommodity);*/
+
+            //QLearning.LOGGER.info("Weights {}", neuralNetwork.getWeights());
+
+        }
 
         QLearning.LOGGER.info("PRODUCTION");
-
-        trading.reseLearningAtributes();
-        trading.initialize(15, 5, 0);
-        trading.run(1, 100000);
-
-        trading.reseLearningAtributes();
-        trading.initialize(15, 5, 1);
-        trading.run(1, 100100);
-
-        trading.reseLearningAtributes();
-        trading.initialize(15, 5, 2);
-        trading.run(1, 101000);
 
         /*trading.reseLearningAtributes();
         trading.initialize(15, 5, 3);
@@ -119,7 +160,7 @@ public class TradingRunner {
         int startingMoney = 10;
         int startingCommodity = 0;
         Trading trading = new Trading(actions, new Random(0), learningRate, discountFactor, randomFactor,
-                new LinearStateEvaluator(features), startingMoney, startingCommodity, sizeOfSeenFector,
+                new LinearStateEvaluator(features), new LinearStateEvaluator(features), startingMoney, startingCommodity, sizeOfSeenFector,
                 new ParameterizedSinus(0, 1, 1, 1), 0);
         trading.run(100000, 100, 0);
 

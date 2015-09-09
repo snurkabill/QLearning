@@ -6,6 +6,6 @@ public class ArtificialFunction extends AbstractTimeSeriesGenerator {
 
     @Override
     public double getValue(long time) {
-        return Math.pow(10, time % 3);
+        return time % 2 == 0 ? 1 : 2;
     }
 }

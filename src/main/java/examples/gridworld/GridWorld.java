@@ -15,7 +15,7 @@ public class GridWorld extends QLearning {
 
     public GridWorld(List<Action> actions, Random random, double learningRate, double discountFactor,
                      double randomFactor, List<List<GridCell>> cells, int x, int y) {
-        super(actions, random, learningRate, discountFactor, randomFactor, null);
+        super(actions, random, learningRate, discountFactor, randomFactor, null, null);
         this.cells = cells;
         this.x = x;
         this.y = y;
@@ -50,5 +50,10 @@ public class GridWorld extends QLearning {
     @Override
     protected State createNextState(State oldState, Action action) {
         return action.createNextState(oldState);
+    }
+
+    @Override
+    protected void duringEpisode(State oldState, Action action) {
+
     }
 }

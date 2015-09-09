@@ -50,7 +50,7 @@ public class StateBasedQValuesContainer extends QValuesContainer {
     }
 
     @Override
-    public double getQ(State state, Action action) {
+    public double getQ(State state, Action action, QValuesContainer.Approximator approximator) {
         if(!qValues.containsKey(state.createHashCode())) {
             qValues.put(state.createHashCode(), new QValues(actions.length));
         }

@@ -16,6 +16,24 @@ public class LinearStateEvaluator extends FeatureBasedStateEvaluator {
     }
 
     @Override
+    public double[] getWeights() {
+        return this.weights;
+    }
+
+    @Override
+    public void pasteWeights(Object weights) {
+        if(weights instanceof double[]) {
+            double[] weights_ = (double[]) weights;
+            for (int i = 0; i < this.weights.length; i++) {
+                this.weights[i] = weights_[i];
+            }
+        } else {
+            throw new IllegalStateException("... ");
+        }
+    }
+
+
+    @Override
     public double getQ(State state, Action action) {
         double value = 0.0;
         for (int i = 0; i < weights.length; i++) {

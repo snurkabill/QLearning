@@ -14,6 +14,10 @@ public abstract class FeatureBasedStateEvaluator {
         this.features = features;
     }
 
+    public abstract Object getWeights();
+
+    public abstract void pasteWeights(Object weights);
+
     public abstract double getQ(State state, Action action);
 
     public abstract void applyTemporalDifference(State oldState, Action action, double difference, double learningRate);
