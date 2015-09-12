@@ -92,11 +92,12 @@ public class TradingRunner {
             QLearning.LOGGER.info("Random Factor: {}", randomFactor);*/
             trading.setRandomFactor(0.3/*randomFactor*/);
             trading.initialize(10, 0, 0);
-            trading.run(10000, 1000, 0);
+            trading.run(10000, 1000, i);
 
             int startingMoney = 10;
             int startingCommodity = 0;
 
+            trading.setRandomFactor(0.0);
             trading.setMode(QLearning.Mode.TESTING);
             trading.initialize(startingMoney, startingCommodity, 0);
             trading.run(1, 1000);
