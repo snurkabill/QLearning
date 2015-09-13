@@ -25,12 +25,9 @@ public class TradingRunner {
 
         Random random = new Random();
 
-
         for (int i = 0; i < 100; i++) {
             random.setSeed(random.nextLong());
         }
-
-
 
         useNeuralNetwork();
     }
@@ -82,15 +79,14 @@ public class TradingRunner {
         trading.initialize(10, 0, 0);
         trading.run(10000, 1000, 0);*/
 
-
         for (int i = 0; i < 1000; i++) {
             QLearning.LOGGER.info("------------------------------------------------------");
             trading.setLearningRate(0.001);
-            trading.setDiscountFactor(0.5);
+            trading.setDiscountFactor(0.9);
             trading.setMode(QLearning.Mode.TRAINING);
-            /*randomFactor = Math.pow(Math.E, (double) -i / 3.0) / 3;
-            QLearning.LOGGER.info("Random Factor: {}", randomFactor);*/
-            trading.setRandomFactor(0.3/*randomFactor*/);
+            randomFactor = Math.pow(Math.E, (double) -i / 20.0) / 3;
+            QLearning.LOGGER.info("Random Factor: {}", randomFactor);
+            trading.setRandomFactor(randomFactor);
             trading.initialize(10, 0, 0);
             trading.run(10000, 1000, i);
 
