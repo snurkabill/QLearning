@@ -73,7 +73,7 @@ public class TradingRunner {
         Trading trading = new Trading(actions, new Random(0), learningRate, discountFactor, randomFactor,
                 new NonLinearStateEvaluatorBasedOnNeuralNetwork(features, neuralNetwork),
                 new NonLinearStateEvaluatorBasedOnNeuralNetwork(features, neuralNetwork2), 10, 0, sizeOfSeenVector,
-                new ParameterizedSinus(0, 1, 1, 1), 0);
+                new ParameterizedSinus(0, 2, 1, 1), 0);
         /*trading.run(1000, 1000, 0);
         trading.setRandomFactor(0.5);
         trading.initialize(10, 0, 0);

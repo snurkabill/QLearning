@@ -1,9 +1,11 @@
-package examples.trading.domain;
+package examples.statebasedtrading.domain;
 
 import domain.Action;
 import domain.State;
 
-public class TradingAction extends Action {
+import java.util.Arrays;
+
+public class StateBasedTradingAction extends Action {
 
     public enum Type {
         BUY,
@@ -14,7 +16,7 @@ public class TradingAction extends Action {
     private final int volume;
     private final Type type;
 
-    public TradingAction(int index, int volume, Type type) {
+    public StateBasedTradingAction(int index, int volume, Type type) {
         super(index);
         this.volume = volume;
         this.type = type;
@@ -30,24 +32,23 @@ public class TradingAction extends Action {
 
     @Override
     public State apply(State state) {
-        TradingState tradingState = (TradingState) state;
+        StateBasedTradingState tradingState = (StateBasedTradingState) state;
         if(type == Type.NOTHING) {
             return tradingState.copy();
         }
         double money = tradingState.getMoney();
         int commodity = tradingState.getCommodity();
-        double lastPrice = tradingState.getLastPrice();
-        TradingState newState = (TradingState) tradingState.copy();
+        double price = tradingState.getPrice();
+        boolean[] prediction = tradingState.getNetworkResults();
         if(type == Type.BUY) {
-            tradingState.setMoney(money - lastPrice * volume);
-            tradingState.setCommodity(commodity + volume);
+            return new StateBasedTradingState(Arrays.copyOf(prediction, prediction.length), commodity + volume,
+                    money - price * volume, price);
         } else if(type == Type.SELL) {
-            tradingState.setMoney(money + lastPrice * volume);
-            tradingState.setCommodity(commodity - volume);
+            return new StateBasedTradingState(Arrays.copyOf(prediction, prediction.length), commodity - volume,
+                    money + price * volume, price);
         } else {
             throw new IllegalStateException("Don't mess with domain.");
         }
-        return newState;
     }
 
 }

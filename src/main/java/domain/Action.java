@@ -8,9 +8,7 @@ public abstract class Action {
         this.index = index;
     }
 
-    public abstract void apply(State state);
-
-    public abstract State createNextState(State state);
+    public abstract State apply(State state);
 
     public int getIndex() {
         return index;

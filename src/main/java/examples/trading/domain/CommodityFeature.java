@@ -8,6 +8,6 @@ public class CommodityFeature implements Feature {
 
     @Override
     public double calculateFeature(State state, Action action) {
-        return ((TradingState)action.createNextState(state)).getCommodity() / 100;
+        return ((TradingState)action.apply(state)).getCommodity() / 100;
     }
 }

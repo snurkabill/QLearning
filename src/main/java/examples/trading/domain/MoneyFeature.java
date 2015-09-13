@@ -8,6 +8,6 @@ public class MoneyFeature implements Feature {
 
     @Override
     public double calculateFeature(State state, Action action) {
-        return ((TradingState)action.createNextState(state)).getMoney() / 100;
+        return ((TradingState)action.apply(state)).getMoney() / 100;
     }
 }

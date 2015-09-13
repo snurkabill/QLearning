@@ -3,7 +3,6 @@ package examples.gridworld;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class GridWorldRunner {
 
@@ -42,7 +41,7 @@ public class GridWorldRunner {
         }
 
         GridWorld gridWorld = new GridWorld(Arrays.asList(new GridWorldAction(0), new GridWorldAction(1),
-                new GridWorldAction(2), new GridWorldAction(3)), new Random(),
+                new GridWorldAction(2), new GridWorldAction(3)), 0,
                 0.1, 0.5, 0.5, Arrays.asList(fifth, second, third, fourth, fifth), 3, 1);
 
         gridWorld.run(1000, 100000, 0);

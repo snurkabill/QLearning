@@ -10,8 +10,8 @@ import examples.trading.domain.TradingState;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
+@Deprecated
 public class Trading extends QLearning {
 
     private double startingMoney;
@@ -28,12 +28,12 @@ public class Trading extends QLearning {
     private int countSellCrash = 0;
     private int[] actionCounts = new int[TradingAction.Type.values().length];
 
-    public Trading(List<Action> actions, Random random, double learningRate, double discountFactor, double randomFactor,
+    public Trading(List<Action> actions, long randomSeed, double learningRate, double discountFactor, double randomFactor,
                    FeatureBasedStateEvaluator featureBasedStateEvaluator,
                    FeatureBasedStateEvaluator shiftedFeatureBasedStateEvaluator, double startingMoney,
                    int startingCommodity, int sizeOfSeenVector, AbstractTimeSeriesGenerator generator,
                    int startingTime) {
-        super(actions, random, learningRate, discountFactor, randomFactor, featureBasedStateEvaluator, shiftedFeatureBasedStateEvaluator);
+        super(actions, randomSeed, learningRate, discountFactor, randomFactor, featureBasedStateEvaluator, shiftedFeatureBasedStateEvaluator);
         this.deltaPrices = new double[sizeOfSeenVector];
         this.prices = new double[sizeOfSeenVector];
         this.generator = generator;
@@ -107,8 +107,8 @@ public class Trading extends QLearning {
     }
 
     @Override
-    protected void afterEpisode(State oldState, int iterationsCount) {
-        super.afterEpisode(oldState, iterationsCount);
+    protected void afterEpisode(State oldState, int stepsCount) {
+        super.afterEpisode(oldState, stepsCount);
         lastState = (TradingState) oldState;
         if(super.getMode() == Mode.TESTING) {
             LOGGER.info("Actions: {}", actionCounts);
@@ -119,7 +119,7 @@ public class Trading extends QLearning {
     }
 
     @Override
-    public State createState() {
+    public State createInitialState() {
         return new TradingState(money, commodity, Arrays.copyOf(deltaPrices, deltaPrices.length), lastPrice);
     }
 
@@ -153,12 +153,4 @@ public class Trading extends QLearning {
         return tradingNewState.getMoney() - tradingOldState.getMoney();
     }
 
-    @Override
-    protected State createNextState(State oldState, Action action) {
-        TradingState tradingState = (TradingState) action.createNextState(oldState);
-        calcNewPrices(time++);
-        tradingState.setDeltaPrice(Arrays.copyOf(deltaPrices, deltaPrices.length));
-        tradingState.setLastPrice(lastPrice);
-        return tradingState;
-    }
 }

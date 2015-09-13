@@ -14,6 +14,6 @@ public class DeltaPriceFeature implements Feature {
 
     @Override
     public double calculateFeature(State state, Action action) {
-        return ((TradingState)action.createNextState(state)).getDeltaPrice()[index] - 1;
+        return ((TradingState)action.apply(state)).getDeltaPrice()[index] - 1;
     }
 }

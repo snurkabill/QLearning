@@ -10,8 +10,8 @@ public class GridWorldAction extends Action {
     }
 
     @Override
-    public void apply(State state) {
-        GridWorldState newState = (GridWorldState) state;
+    public State apply(State state) {
+        GridWorldState newState = (GridWorldState) state.copy();
         if(index == 0) {
             newState.setX(newState.getX() + 1);
         } else if(index == 1) {
@@ -23,12 +23,6 @@ public class GridWorldAction extends Action {
         } else {
             throw new IllegalStateException("There is no such action");
         }
-    }
-
-    @Override
-    public State createNextState(State state) {
-        GridWorldState newState = (GridWorldState) state.copy();
-        apply(newState);
         return newState;
     }
 }

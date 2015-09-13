@@ -30,10 +30,10 @@ public abstract class QLearning {
     private final QValuesContainer qValuesContainer;
     private int totalStepsCounter;
 
-    public QLearning(List<Action> actions, Random random, double learningRate, double discountFactor,
+    public QLearning(List<Action> actions, long randomSeed, double learningRate, double discountFactor,
                       double randomFactor, FeatureBasedStateEvaluator featureBasedStateEvaluator,
                      FeatureBasedStateEvaluator shiftedFeatureBasedStateEvaluator) {
-        this.random = random;
+        this.random = new Random(randomSeed);
         this.actions = convertListToArray(actions);
         this.learningRate = learningRate;
         this.discountFactor = discountFactor;
@@ -82,27 +82,24 @@ public abstract class QLearning {
         this.randomFactor = randomFactor;
     }
 
-    public abstract State createState();
+    protected abstract State createInitialState();
 
     protected abstract boolean isFinished(State state);
 
     protected abstract double calcReward(State oldState, State newState, Action action);
 
-    protected abstract State createNextState(State oldState, Action action);
-
     protected void beforeEpisode() {
         LOGGER.debug("Starting episode");
-        random.setSeed(random.nextLong());
     }
 
-    protected abstract void duringEpisode(State oldState, Action action);
+    protected abstract void duringEpisode(State state, Action action);
 
-    protected void afterEpisode(State oldState, int iterationsCount) {
-        LOGGER.debug("Ending episode after {} steps", iterationsCount);
-        totalStepsCounter += iterationsCount;
+    protected void afterEpisode(State state, int stepsCount) {
+        LOGGER.debug("Ending episode after {} steps", stepsCount);
+        totalStepsCounter += stepsCount;
     }
 
-    private Action createRandomAction(State state) {
+    private Action createRandomAction() {
         return actions[random.nextInt(actions.length)];
     }
 
@@ -111,17 +108,17 @@ public abstract class QLearning {
     }
 
     private Action createAction(State state) {
-        if(random.nextDouble() < randomFactor) {
-            LOGGER.trace("Random action picked!");
-            return createRandomAction(state);
+        if(mode == Mode.TRAINING && random.nextDouble() < randomFactor) {
+            LOGGER.trace("Picking random action");
+            return createRandomAction();
         } else {
             return determineNextAction(state);
         }
     }
 
-    public void run(int episodesCount, int maxIterationsPerEpisode, long seed) {
+    public void run(int episodesCount, int maxStepsPerEpisode, long seed) {
         this.random.setSeed(seed);
-        run(episodesCount, maxIterationsPerEpisode);
+        run(episodesCount, maxStepsPerEpisode);
     }
 
     public void run(int episodesCount, int maxIterationsPerEpisode) {
@@ -130,24 +127,24 @@ public abstract class QLearning {
         for (int i = 0; i < episodesCount; i++) {
             run(maxIterationsPerEpisode);
         }
-        LOGGER.info("Average steps: {}", (double) totalStepsCounter / episodesCount );
+        LOGGER.info("Average steps per episode: {}", (double) totalStepsCounter / episodesCount);
     }
 
-    public void run(int iterationsCount) {
+    public void run(int stepsCount) {
         beforeEpisode();
-        State newState = createState();
+        State newState = createInitialState();
         Action action;
-        int iterations = 0;
-        for (; !isFinished(newState) && iterations < iterationsCount; iterations++) {
+        int numOfSteps = 0;
+        for (; !isFinished(newState) && numOfSteps < stepsCount; numOfSteps++) {
             State oldState = newState;
             action = createAction(oldState);
             duringEpisode(oldState, action);
-            newState = createNextState(oldState, action);
+            newState = action.apply(oldState);
             if(mode == Mode.TRAINING) {
                 calculateQ(oldState, newState, action);
             }
         }
-        afterEpisode(newState, iterations);
+        afterEpisode(newState, numOfSteps);
     }
 
     protected void calculateQ(State oldState, State newState, Action action) {

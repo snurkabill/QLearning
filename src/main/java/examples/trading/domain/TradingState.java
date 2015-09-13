@@ -81,7 +81,7 @@ public class TradingState extends State {
         if(Math.abs(lastPrice - that.lastPrice) > TOLERANCE) {
             return false;
         }
-        return false;
+        return true;
     }
 
     @Override
